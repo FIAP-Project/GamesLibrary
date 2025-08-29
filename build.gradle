@@ -1,6 +1,14 @@
+buildscript {
+    dependencies {
+        classpath 'org.postgresql:postgresql:42.7.3'
+        classpath "org.flywaydb:flyway-database-postgresql:11.11.2"
+    }
+}
+
 plugins {
     id 'java'
     id 'application'
+    id 'org.flywaydb.flyway' version '10.17.3'
 }
 
 group = 'com.cerbon'
@@ -18,8 +26,21 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+flyway {
+    url = "jdbc:postgresql://localhost:5432/gameslibrary"
+    user = "games_user"
+    password = "games_pass"
+    baselineOnMigrate = true
+}
+
 application {
     mainClass = 'com.cerbon.Main'
+}
+
+tasks.register('migrate') {
+    group = 'application'
+    description = 'Runs Flyway database migrations'
+    dependsOn 'flywayMigrate'
 }
 
 java {
