@@ -19,8 +19,7 @@ public class GamesLibraryMainView extends JFrame {
     // GUI Components
     private JTable gamesTable;
     private DefaultTableModel tableModel;
-    private TableRowSorter<TableModel> tableSorter;
-    
+
     // Filter components
     private JComboBox<Gender> genderFilter;
     private JComboBox<Platform> platformFilter;
@@ -63,7 +62,7 @@ public class GamesLibraryMainView extends JFrame {
         gamesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         // Enable sorting
-        tableSorter = new TableRowSorter<>(tableModel);
+        TableRowSorter<TableModel> tableSorter = new TableRowSorter<>(tableModel);
         gamesTable.setRowSorter(tableSorter);
         
         // Set column widths

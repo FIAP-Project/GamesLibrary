@@ -7,7 +7,6 @@ import com.cerbon.model.type.Platform;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Map;
 
 public class ReportDialog extends JDialog {

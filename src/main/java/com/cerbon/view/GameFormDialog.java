@@ -8,7 +8,6 @@ import com.cerbon.model.type.Status;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 
 public class GameFormDialog extends JDialog {
