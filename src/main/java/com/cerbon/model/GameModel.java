@@ -10,5 +10,6 @@ public record GameModel(
         Gender gender,
         Platform platform,
         int year,
-        Status status) {
+        Status status,
+        int rate) {
 }

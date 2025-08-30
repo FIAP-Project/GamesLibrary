@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS games (
     gender VARCHAR(32),
     platform VARCHAR(32),
     year INT,
-    status VARCHAR(32)
+    status VARCHAR(32),
+    rate INT
 );
