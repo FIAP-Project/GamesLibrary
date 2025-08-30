@@ -41,10 +41,10 @@ public class PostgresGamesRepository implements IGamesRepository {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, game.title());
-            stmt.setString(2, game.gender() != null ? game.gender().name() : null);
-            stmt.setString(3, game.platform() != null ? game.platform().name() : null);
+            stmt.setString(2, game.gender().name());
+            stmt.setString(3, game.platform().name());
             stmt.setInt(4, game.year());
-            stmt.setString(5, game.status() != null ? game.status().name() : null);
+            stmt.setString(5, game.status().name());
             stmt.setInt(6, game.rate());
             
             int rowsAffected = stmt.executeUpdate();
@@ -81,10 +81,10 @@ public class PostgresGamesRepository implements IGamesRepository {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, game.title());
-            stmt.setString(2, game.gender() != null ? game.gender().name() : null);
-            stmt.setString(3, game.platform() != null ? game.platform().name() : null);
+            stmt.setString(2, game.gender().name());
+            stmt.setString(3, game.platform().name());
             stmt.setInt(4, game.year());
-            stmt.setString(5, game.status() != null ? game.status().name() : null);
+            stmt.setString(5, game.status().name());
             stmt.setInt(6, game.rate());
             stmt.setInt(7, game.id());
             
