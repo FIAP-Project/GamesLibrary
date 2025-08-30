@@ -47,7 +47,7 @@ public class GameFormDialog extends JDialog {
         statusCombo = new JComboBox<>(Status.values());
 
         int currentYear = java.time.LocalDate.now().getYear();
-        yearSpinner = new JSpinner(new SpinnerNumberModel(currentYear, 1970, currentYear, 1));
+        yearSpinner = new JSpinner(new SpinnerNumberModel(currentYear, 1970, currentYear + 5, 1));
 
         rateSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
 
