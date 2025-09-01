@@ -13,6 +13,11 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Main application window for the Games Library application.
+ * Provides a comprehensive interface with a sortable table for displaying games,
+ * filtering capabilities, and action buttons for managing game data and generating reports.
+ */
 public class GamesLibraryMainView extends JFrame {
     private final GameController controller;
     

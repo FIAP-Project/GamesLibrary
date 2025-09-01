@@ -9,6 +9,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Map;
 
+/**
+ * Modal dialog for displaying comprehensive reports about concluded games.
+ * Provides tabbed views showing game completion statistics grouped by platform and genre
+ * with visual charts and percentage breakdowns for better data analysis.
+ */
 public class ReportDialog extends JDialog {
     private final GameController controller;
     

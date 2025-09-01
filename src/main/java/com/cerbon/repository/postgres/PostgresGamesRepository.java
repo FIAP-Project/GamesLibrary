@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * PostgreSQL implementation of the IGamesRepository interface.
+ * Handles all database operations for game entities using JDBC connections
+ * to a PostgreSQL database with connection pooling and error handling.
+ */
 public class PostgresGamesRepository implements IGamesRepository {
     
     private static final String URL = "jdbc:postgresql://localhost:5432/gameslibrary";

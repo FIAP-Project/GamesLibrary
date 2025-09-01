@@ -10,6 +10,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 
+/**
+ * Modal dialog for adding new games or editing existing ones.
+ * Provides a form interface with input validation for all game properties
+ * including title, genre, platform, year, status, and rating.
+ */
 public class GameFormDialog extends JDialog {
     private boolean confirmed = false;
     

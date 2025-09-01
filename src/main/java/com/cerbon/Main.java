@@ -7,6 +7,11 @@ import com.cerbon.view.GamesLibraryMainView;
 
 import javax.swing.*;
 
+/**
+ * Main entry point for the Games Library application.
+ * This class initializes the Swing GUI application with PostgreSQL database support,
+ * sets up the system look and feel, and launches the main application window.
+ */
 public class Main {
     public static void main(String[] args) {
         try {

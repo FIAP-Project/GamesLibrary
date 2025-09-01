@@ -13,6 +13,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class that handles all business logic for game management operations.
+ * Provides methods for adding, updating, deleting, and querying games with validation,
+ * filtering capabilities, and reporting functionality for concluded games by platform and gender.
+ */
 public class GameController {
     private final IGamesRepository repository;
     
