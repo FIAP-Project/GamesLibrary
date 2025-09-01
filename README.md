@@ -90,4 +90,4 @@ If you change any of these (e.g., in Docker or local PostgreSQL), update your Gr
 
 ## Project overview
 - Pattern: Model–View–Controller (MVC)
-- Capabilities: add, update, delete, and filter games in your library
+- Capabilities: add, update, get, delete, and filter games in your library
