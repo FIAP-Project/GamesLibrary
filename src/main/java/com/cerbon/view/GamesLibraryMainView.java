@@ -1,6 +1,5 @@
 package com.cerbon.view;
 
-import com.cerbon.controller.GameController;
 import com.cerbon.model.GameModel;
 import com.cerbon.model.type.Gender;
 import com.cerbon.model.type.Platform;
@@ -11,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
@@ -19,8 +19,6 @@ import java.util.List;
  * filtering capabilities, and action buttons for managing game data and generating reports.
  */
 public class GamesLibraryMainView extends JFrame {
-    private final GameController controller;
-    
     // GUI Components
     private JTable gamesTable;
     private DefaultTableModel tableModel;
@@ -39,12 +37,10 @@ public class GamesLibraryMainView extends JFrame {
     private JButton clearFiltersButton;
     private JButton refreshButton;
     
-    public GamesLibraryMainView(GameController controller) {
-        this.controller = controller;
+    public GamesLibraryMainView() {
         initializeComponents();
         setupLayout();
         setupEventHandlers();
-        loadGamesData();
     }
     
     private void initializeComponents() {
@@ -140,7 +136,7 @@ public class GamesLibraryMainView extends JFrame {
         buttonPanel.add(deleteButton);
         buttonPanel.add(reportButton);
         
-        // Add panels to main frame
+        // Add panels to the main frame
         add(filterPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
@@ -154,21 +150,9 @@ public class GamesLibraryMainView extends JFrame {
                 deleteButton.setEnabled(hasSelection);
             }
         });
-
-        addButton.addActionListener(e -> showAddGameDialog());
-        editButton.addActionListener(e -> showEditGameDialog());
-        deleteButton.addActionListener(e -> deleteSelectedGame());
-        reportButton.addActionListener(e -> showReportDialog());
-        applyFiltersButton.addActionListener(e -> applyFilters());
-        clearFiltersButton.addActionListener(e -> clearFilters());
-        refreshButton.addActionListener(e -> loadGamesData());
     }
     
-    private void loadGamesData() {
-        loadGamesData(controller.getAllGames());
-    }
-    
-    private void loadGamesData(List<GameModel> games) {
+    public void setGamesData(List<GameModel> games) {
         tableModel.setRowCount(0); // Clear existing data
         
         for (GameModel game : games) {
@@ -185,31 +169,31 @@ public class GamesLibraryMainView extends JFrame {
         }
     }
     
-    private void showAddGameDialog() {
+    // Event registration for controller
+    public void onAdd(ActionListener l) { addButton.addActionListener(l); }
+    public void onEdit(ActionListener l) { editButton.addActionListener(l); }
+    public void onDelete(ActionListener l) { deleteButton.addActionListener(l); }
+    public void onReport(ActionListener l) { reportButton.addActionListener(l); }
+    public void onApplyFilters(ActionListener l) { applyFiltersButton.addActionListener(l); }
+    public void onClearFilters(ActionListener l) { clearFiltersButton.addActionListener(l); }
+    public void onRefresh(ActionListener l) { refreshButton.addActionListener(l); }
+
+    public GameFormDialog.GameData promptAddGame() {
         GameFormDialog dialog = new GameFormDialog(this, "Adicionar Jogo", null);
         dialog.setVisible(true);
-        
-        if (dialog.isConfirmed()) {
-            GameFormDialog.GameData data = dialog.getGameData();
-            GameController.OperationResult<GameModel> result = controller.addGame(
-                data.title(), data.gender(), data.platform(), data.year(), data.status(), data.rate()
-            );
-            
-            if (result.success()) {
-                JOptionPane.showMessageDialog(this, result.message(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                loadGamesData();
-            } else
-                JOptionPane.showMessageDialog(this, result.message(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+        return dialog.isConfirmed() ? dialog.getGameData() : null;
     }
-    
-    private void showEditGameDialog() {
+
+    public GameFormDialog.GameData promptEditGame(GameModel currentGame) {
+        GameFormDialog dialog = new GameFormDialog(this, "Editar Jogo", currentGame);
+        dialog.setVisible(true);
+        return dialog.isConfirmed() ? dialog.getGameData() : null;
+    }
+
+    public GameModel getSelectedGameFromTable() {
         int selectedRow = gamesTable.getSelectedRow();
-        if (selectedRow == -1) return;
-        
-        // Convert view row to model row (important when sorting is applied)
+        if (selectedRow == -1) return null;
         int modelRow = gamesTable.convertRowIndexToModel(selectedRow);
-        
         int gameId = (Integer) tableModel.getValueAt(modelRow, 0);
         String title = (String) tableModel.getValueAt(modelRow, 1);
         Gender gender = Gender.fromString((String) tableModel.getValueAt(modelRow, 2));
@@ -217,72 +201,40 @@ public class GamesLibraryMainView extends JFrame {
         int year = (Integer) tableModel.getValueAt(modelRow, 4);
         Status status = Status.fromString((String) tableModel.getValueAt(modelRow, 5));
         int rate = (Integer) tableModel.getValueAt(modelRow, 6);
-        
-        GameModel currentGame = new GameModel(gameId, title, gender, platform, year, status, rate);
-        
-        GameFormDialog dialog = new GameFormDialog(this, "Editar Jogo", currentGame);
-        dialog.setVisible(true);
-        
-        if (dialog.isConfirmed()) {
-            GameFormDialog.GameData data = dialog.getGameData();
-            GameController.OperationResult<GameModel> result = controller.updateGame(
-                gameId, data.title(), data.gender(), data.platform(), data.year(), data.status(), data.rate()
-            );
-            
-            if (result.success()) {
-                JOptionPane.showMessageDialog(this, result.message(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                loadGamesData();
-            } else
-                JOptionPane.showMessageDialog(this, result.message(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+        return new GameModel(gameId, title, gender, platform, year, status, rate);
     }
-    
-    private void deleteSelectedGame() {
-        int selectedRow = gamesTable.getSelectedRow();
-        if (selectedRow == -1) return;
-        
-        // Convert view row to model row
-        int modelRow = gamesTable.convertRowIndexToModel(selectedRow);
-        int gameId = (Integer) tableModel.getValueAt(modelRow, 0);
-        String gameTitle = (String) tableModel.getValueAt(modelRow, 1);
-        
-        int confirm = JOptionPane.showConfirmDialog(
-            this,
-            "Deseja realmente remover o jogo \"" + gameTitle + "\"?",
-            "Confirmar Remoção",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
-        );
-        
-        if (confirm == JOptionPane.YES_OPTION) {
-            GameController.OperationResult<Void> result = controller.deleteGame(gameId);
-            
-            if (result.success()) {
-                JOptionPane.showMessageDialog(this, result.message(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                loadGamesData();
-            } else
-                JOptionPane.showMessageDialog(this, result.message(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void showReportDialog() {
-        ReportDialog dialog = new ReportDialog(this, controller);
-        dialog.setVisible(true);
-    }
-    
-    private void applyFilters() {
-        Gender selectedGender = (Gender) genderFilter.getSelectedItem();
-        Platform selectedPlatform = (Platform) platformFilter.getSelectedItem();
-        Status selectedStatus = (Status) statusFilter.getSelectedItem();
-        
-        List<GameModel> filteredGames = controller.filterGames(selectedGender, selectedPlatform, selectedStatus);
-        loadGamesData(filteredGames);
-    }
-    
-    private void clearFilters() {
+
+    public Gender getSelectedGenderFilter() { return (Gender) genderFilter.getSelectedItem(); }
+    public Platform getSelectedPlatformFilter() { return (Platform) platformFilter.getSelectedItem(); }
+    public Status getSelectedStatusFilter() { return (Status) statusFilter.getSelectedItem(); }
+
+    public void resetFilters() {
         genderFilter.setSelectedIndex(0);
         platformFilter.setSelectedIndex(0);
         statusFilter.setSelectedIndex(0);
-        loadGamesData();
+    }
+
+    public boolean confirmDeletion(String gameTitle) {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Deseja realmente remover o jogo \"" + gameTitle + "\"?",
+                "Confirmar Remoção",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        return confirm == JOptionPane.YES_OPTION;
+    }
+
+    public void showReport(java.util.Map<Platform, Long> platformData, java.util.Map<Gender, Long> genderData) {
+        ReportDialog dialog = new ReportDialog(this, platformData, genderData);
+        dialog.setVisible(true);
+    }
+
+    public void showInfoMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
     }
 }

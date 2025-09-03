@@ -1,6 +1,5 @@
 package com.cerbon.view;
 
-import com.cerbon.controller.GameController;
 import com.cerbon.model.type.Gender;
 import com.cerbon.model.type.Platform;
 
@@ -15,7 +14,8 @@ import java.util.Map;
  * with visual charts and percentage breakdowns for better data analysis.
  */
 public class ReportDialog extends JDialog {
-    private final GameController controller;
+    private final Map<Platform, Long> platformData;
+    private final Map<Gender, Long> genderData;
     
     // Components
     private JTabbedPane tabbedPane;
@@ -24,9 +24,10 @@ public class ReportDialog extends JDialog {
     private JButton refreshButton;
     private JButton closeButton;
     
-    public ReportDialog(Frame parent, GameController controller) {
+    public ReportDialog(Frame parent, Map<Platform, Long> platformData, Map<Gender, Long> genderData) {
         super(parent, "Relatório de Jogos Concluídos", true);
-        this.controller = controller;
+        this.platformData = platformData;
+        this.genderData = genderData;
         
         initializeComponents();
         setupLayout();
@@ -40,7 +41,7 @@ public class ReportDialog extends JDialog {
     private void initializeComponents() {
         setSize(500, 400);
         
-        // Create tabbed pane for different report types
+        // Create a tabbed pane for different report types
         tabbedPane = new JTabbedPane();
         
         // Text areas for reports (non-editable)
@@ -110,7 +111,7 @@ public class ReportDialog extends JDialog {
     }
     
     private void generatePlatformReport() {
-        Map<Platform, Long> platformData = controller.getConcludedGamesByPlatform();
+        Map<Platform, Long> platformData = this.platformData;
         
         StringBuilder report = new StringBuilder();
         report.append("RELATÓRIO DE JOGOS CONCLUÍDOS POR PLATAFORMA\n");
@@ -156,7 +157,7 @@ public class ReportDialog extends JDialog {
     }
     
     private void generateGenderReport() {
-        Map<Gender, Long> genderData = controller.getConcludedGamesByGender();
+        Map<Gender, Long> genderData = this.genderData;
         
         StringBuilder report = new StringBuilder();
         report.append("RELATÓRIO DE JOGOS CONCLUÍDOS POR GÊNERO\n");

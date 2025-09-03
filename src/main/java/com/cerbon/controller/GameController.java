@@ -5,6 +5,8 @@ import com.cerbon.model.type.Gender;
 import com.cerbon.model.type.Platform;
 import com.cerbon.model.type.Status;
 import com.cerbon.repository.IGamesRepository;
+import com.cerbon.view.GamesLibraryMainView;
+import com.cerbon.view.GameFormDialog;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,9 +22,93 @@ import java.util.stream.Collectors;
  */
 public class GameController {
     private final IGamesRepository repository;
+    private final GamesLibraryMainView view;
     
-    public GameController(IGamesRepository repository) {
+    public GameController(IGamesRepository repository, GamesLibraryMainView view) {
         this.repository = repository;
+        this.view = view;
+        if (this.view != null) {
+            attachViewListeners();
+            // Initial load of data into the view
+            this.view.setGamesData(getAllGames());
+            this.view.setVisible(true);
+        }
+    }
+
+    private void attachViewListeners() {
+        view.onAdd(e -> {
+            GameFormDialog.GameData data = view.promptAddGame();
+            if (data != null) {
+                OperationResult<GameModel> result = addGame(
+                        data.title(), data.gender(), data.platform(), data.year(), data.status(), data.rate()
+                );
+                if (result.success()) {
+                    view.showInfoMessage(result.message());
+                    view.setGamesData(getAllGames());
+                } else {
+                    view.showErrorMessage(result.message());
+                }
+            }
+        });
+
+        view.onEdit(e -> {
+            GameModel current = view.getSelectedGameFromTable();
+            if (current == null) {
+                view.showErrorMessage("Selecione um jogo para editar.");
+                return;
+            }
+            GameFormDialog.GameData data = view.promptEditGame(current);
+            if (data != null) {
+                OperationResult<GameModel> result = updateGame(
+                        current.id(), data.title(), data.gender(), data.platform(), data.year(), data.status(), data.rate()
+                );
+                if (result.success()) {
+                    view.showInfoMessage(result.message());
+                    view.setGamesData(getAllGames());
+                } else {
+                    view.showErrorMessage(result.message());
+                }
+            }
+        });
+
+        view.onDelete(e -> {
+            GameModel current = view.getSelectedGameFromTable();
+            if (current == null) {
+                view.showErrorMessage("Selecione um jogo para remover.");
+                return;
+            }
+            boolean confirmed = view.confirmDeletion(current.title());
+            if (confirmed) {
+                OperationResult<Void> result = deleteGame(current.id());
+                if (result.success()) {
+                    view.showInfoMessage(result.message());
+                    view.setGamesData(getAllGames());
+                } else {
+                    view.showErrorMessage(result.message());
+                }
+            }
+        });
+
+        view.onReport(e -> {
+            Map<Platform, Long> platformData = getConcludedGamesByPlatform();
+            Map<Gender, Long> genderData = getConcludedGamesByGender();
+            view.showReport(platformData, genderData);
+        });
+
+        view.onApplyFilters(e -> {
+            Gender selectedGender = view.getSelectedGenderFilter();
+            Platform selectedPlatform = view.getSelectedPlatformFilter();
+            Status selectedStatus = view.getSelectedStatusFilter();
+            List<GameModel> filtered = filterGames(selectedGender, selectedPlatform, selectedStatus);
+            view.setGamesData(filtered);
+        });
+
+        view.onClearFilters(e -> {
+            view.resetFilters();
+            view.setGamesData(getAllGames());
+        });
+
+        view.onRefresh(e -> view.setGamesData(getAllGames()));
     }
 
     public ValidationResult validateGame(GameModel game) {

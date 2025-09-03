@@ -24,11 +24,8 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             try {
                 IGamesRepository repository = new PostgresGamesRepository();
-
-                GameController controller = new GameController(repository);
-
-                GamesLibraryMainView mainView = new GamesLibraryMainView(controller);
-                mainView.setVisible(true);
+                GamesLibraryMainView mainView = new GamesLibraryMainView();
+                GameController controller = new GameController(repository, mainView);
 
                 System.out.println("Games Library application started successfully!");
 
